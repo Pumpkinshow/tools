@@ -19,7 +19,7 @@ console.log('Deploying "%s"', name);
 });
 
 program.parse(process.argv);
-
+console.log('begin');
 console.log('源文件地址：', Path.resolve(process.cwd(), program.origin));
 console.log('产出地址：', Path.resolve(process.cwd(), program.dist));
 
@@ -36,5 +36,6 @@ if(dist && !reg.test(dist)){
 // console.log(process.cwd()); //命令行pwd地址
 // console.log(process.execPath);//node.exe 地址
 bx(Path.resolve(process.cwd(),program.origin),Path.resolve(process.cwd(),dist));
+console.log('------success success-------');
 
 

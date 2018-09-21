@@ -11,9 +11,9 @@ var PATH = require("path");
     var dist = d;
     //临时文件存放的目录
     var tempUrl = PATH.resolve(__dirname , './temp.xlsx');
-    console.log(tempUrl,999 + 'temp');
+    // xlsx读取xls文件
     var workbook_xls = XLS.readFile(origin,{cellStyles:true,cellDates:false});
-    // 这里生成temp.xlsx的原因是xlsx-style插件不能识别.xls的文件，生成一个临时temp.xlsx
+    // 生成temp.xlsx的原因是，xlsx-style插件不能识别.xls的文件，需生成一个临时temp.xlsx
     XLS.writeFile(workbook_xls, tempUrl, {bookType:'xlsx',bookSST: false, type: 'binary'});
     var workbook = XLSX.readFile(tempUrl,{cellStyles:true,cellDates:false});
     // {
@@ -44,6 +44,7 @@ var PATH = require("path");
     var Sheets = workbook.Sheets;
     var newSheets = {};
     var reg = /="(.+)"/;
+    var name = "";
     for(var key in Sheets){
         for(var k in Sheets[key]){
             //="xxxx" => xxxx,去掉两边的双引号
@@ -109,6 +110,7 @@ var PATH = require("path");
                     if([1,2,3,4,5].indexOf(date.q) ==-1){
                         repay = 50;
                     }
+                    name = sheetArr[1].v;
                     if(date.y == '1900'){
                         sheet['F' + i] = {"t":"s","v":"加班误餐费"};
                         sheet['G' + i] = {"t":"s","v":"交通费"};
@@ -123,6 +125,16 @@ var PATH = require("path");
             }
             j++;
         }
+        repayTotal += repay;
+        sheet['A' + i] = {"t":"s","v":'合计','s':{alignment:{vertical:'center',horizontal:'center'}}};
+        sheet['B' + i] = {"t":"s","v":'','s':{alignment:{vertical:'center',horizontal:'center'}}};
+        sheet['C' + i] = {"t":"s","v":'','s':{alignment:{vertical:'center',horizontal:'center'}}};
+        sheet['D' + i] = {"t":"s","v":'','s':{alignment:{vertical:'center',horizontal:'center'}}};
+        sheet['E' + i] = {"t":"s","v":'','s':{alignment:{vertical:'center',horizontal:'center'}}};
+        sheet['F' + i] = {"t":"n","v":repayTotal,'s':{alignment:{vertical:'center',horizontal:'center'}}};
+        sheet['G' + i] = {"t":"n","v":0,'s':{alignment:{vertical:'center',horizontal:'center'}}};
+        sheet['H' + i] = {"t":"n","v":repayTotal,'s':{alignment:{vertical:'center',horizontal:'center'}}};
+
         for(var ks in sheet){
             sheet[ks]['s'] = {
                 alignment:{vertical:'center',horizontal:'center'},
@@ -134,14 +146,10 @@ var PATH = require("path");
                 }
             };
         }
-        repayTotal += repay;
-        sheet['F' + i] = {"t":"n","v":repayTotal,'s':{alignment:{vertical:'center',horizontal:'center'}}};
-        sheet['G' + i] = {"t":"n","v":0,'s':{alignment:{vertical:'center',horizontal:'center'}}};
-        sheet['H' + i] = {"t":"n","v":repayTotal,'s':{alignment:{vertical:'center',horizontal:'center'}}};
 
-        sheet['F' + (i+2)] = {"t":"s","v":"报销人：XXX",'s':{alignment:{vertical:'center'}}};
+        sheet['F' + (i+2)] = {"t":"s","v":"报销人：" + name ,'s':{alignment:{vertical:'center'}}};
         sheet['F' + (i+3)] = {"t":"s","v":"报销金额：" + repayTotal + "元",'s':{alignment:{vertical:'center'}}};
-        sheet['F' + (i+4)] = {"t":"s","v":"餐饮发票：暂无",'s':{alignment:{vertical:'left'}}};
+        sheet['F' + (i+4)] = {"t":"s","v":"餐饮发票：0元",'s':{alignment:{vertical:'left'}}};
         sheet['F' + (i+5)] = {"t":"s","v":"交通费发票：0元",'s':{alignment:{vertical:'left'}}};
         merges.push({s: {c: 5, r:i_i }, e: {c:5, r:i-2}});
         merges.push({s: {c: 6, r:i_i }, e: {c:6, r:i-2}});
@@ -167,15 +175,11 @@ var PATH = require("path");
         Sheets:newSheets
     };
 
-
     // console.log(JSON.stringify(newWorkbook).substr(0,2000));
-
-
     // console.log(workbook.SheetNames);
     // console.log(workbook.Sheets[sheetNames[0]]['!ref']) //有效范围
 
-    // console.log(PATH.resolve(__dirname,"./temp.xlsx"));
     //删除temp.xlsx 文件
-    // fs.unlink(tempUrl);
+    fs.unlink(tempUrl);
     XLSX.writeFile(newWorkbook, dist,{cellDates:true});
 }

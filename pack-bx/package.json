@@ -1,6 +1,6 @@
 {
   "name": "pack-bx",
-  "version": "1.0.2",
+  "version": "1.0.4",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -17,6 +17,10 @@
     "path": "^0.12.7",
     "xlsx": "^0.13.5",
     "xlsx-style": "^0.8.13"
+  },
+  "repository": { 
+    "type" : "git",
+    "url" : "https://github.com/Pumpkinshow/tools/tree/master/pack-bx"
   },
   "devDependencies": {
     "commander": "^2.18.0",
